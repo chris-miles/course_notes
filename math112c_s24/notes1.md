@@ -6,13 +6,13 @@
 - That presents an "applied" bias, but from a pure math perspective: they show up in geometry (Ricci flow), probability (random walks), and many other areas.
 - MATH 112A and MATH 112B provide the **essential** foundation but there is a bit of a gap between this material and any applied problems.
 - My goal of this class is to give you a "survey" of everything else out there. By no means exhaustive! But meant to excite you to the possibilities of why people like PDEs.
-- (PDEs themselves are very interesting and mathematicians *do* study their behavior just for the sake of doing so. This leads to very intruiging and deep ideas. However, this will not be the emphasis of this course.)
+- (PDEs themselves are very interesting and mathematicians do study their behavior just for the sake of doing so. This leads to very intriguing and deep ideas. However, this will not be the emphasis of this course.)
 
 ###  Schematic of the Course
 
 - **Weeks 1 through 3** Numerical methods for PDEs: 
   - Most PDEs are too complex to be solved (or even studied) using the ideas you learned in MATH 112AB. 
-  - Instead, people (especially in engineering, sciences) construct *approximate* numerical solutions. This is a whole can of worms of theory & intrigue but also pitfalls & headaches.
+  - Instead, people (especially in engineering, sciences) construct approximate numerical solutions. This is a whole can of worms of theory & intrigue but also pitfalls & headaches.
   - MATH 107 (Numerical Solns to DEs) covers this for ODEs. Since this hasn't been offered in a few years, I will start with a very brief overview of these ideas. 
   - ~2 homework assignments (~2-3 problems each), coding in whatever language you want. 
 - **Weeks 4 through 8** Applications of PDEs:
@@ -54,7 +54,11 @@ Classify each of the equations as best you can. Discuss with a partner. Some des
 1. $$ \frac{\partial y}{\partial t} + y^2 = e^{-t}, \quad y(0)=1.$$​
 2. $$\partial_t u = \partial_{xx} u, \quad  u(-L,t)=0, \quad \partial_x u(L, t) =0.$$​
 3. $$u_t - u_{xx} = ru(1-u), \quad u(x,0) = g(x), \quad x \in \mathbb{R}.$$​
-4. $${\displaystyle {\frac {\partial }{\partial t}}(\rho \mathbf {u} )+\nabla \cdot \left(\rho \mathbf {u} \otimes \mathbf {u} +[p-\zeta (\nabla \cdot \mathbf {u} )]\mathbf {I} -\mu \left[\nabla \mathbf {u} +(\nabla \mathbf {u} )^{\mathrm {T} }-{\tfrac {2}{3}}(\nabla \cdot \mathbf {u} )\mathbf {I} \right]\right)=\rho \mathbf {g} .}$$ 
+4. $${\displaystyle {\frac {\partial }{\partial t}}(\rho \mathbf {u} )+\nabla \cdot \left(\rho \mathbf {u} \otimes \mathbf {u} +[p-\zeta (\nabla \cdot \mathbf {u} )]\mathbf {I} -\mu \left[\nabla \mathbf {u} +(\nabla \mathbf {u} )^{\mathrm {T} }-{\tfrac {2}{3}}(\nabla \cdot \mathbf {u} )\mathbf {I} \right]\right)=\rho \mathbf {g} .}$$​ 
+
+---
+
+
 
 ## Part 1, Intro to Numerical Methods for ODEs & PDEs
 
@@ -91,9 +95,11 @@ Classify each of the equations as best you can. Discuss with a partner. Some des
   y_{n+1} = y_n + h f(y_n, t_n)
   $$
 
-- Since we know the initial value $y_0$, we can continually use this update rule in a "for loop".
+- Since we know the initial value $y_0$​, we can continually use this update rule in a "for loop".
 
-- Just because we *can* do this, doesn't mean we *should*. That is, whenever you approximate sometihng, you should always follow this with asking: *how good of an approximation is this?* 
+  <img src="euler.png" alt="w" style="zoom:25%;" />
+
+- Just because we *can* do this, doesn't mean we *should*. That is, whenever you approximate something, you should always follow this with asking: *how good of an approximation is this?* 
 
 - Answering these types of questions is a whole field of *numerical analysis* and we will give a taste of it here.
 
