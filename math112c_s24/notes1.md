@@ -97,7 +97,7 @@ Classify each of the equations as best you can. Discuss with a partner. Some des
 
 - Since we know the initial value $y_0$​, we can continually use this update rule in a "for loop".
 
-  <img src="euler.png" alt="w" style="zoom:25%;" />
+  <img src="euler.png" alt="w" style="width:50%;" />
 
 - Just because we *can* do this, doesn't mean we *should*. That is, whenever you approximate something, you should always follow this with asking: *how good of an approximation is this?* 
 
