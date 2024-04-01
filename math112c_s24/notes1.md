@@ -143,8 +143,50 @@ Classify each of the equations as best you can. Discuss with a partner. Some des
 ### Error and Stability for Euler Methods
 
 - It is not so easy to come up with a single metric of success for a numerical method for DEs. In fact, we will see there are many options and they capture different ideas.
-- 
+
+- Some errors are called “roundoff” or “floating point” - these have to do with how computers store and represent numbers (how does a computer represent $1/3$ with bits $0,1$? ) but we will ignore these
+
+- Instead we want to focus on the error in approximating solutions to DEs
+
+- **Local error** is the error introduced at each step, **global error** is the total accumulated error between the true and approximate solution. A bit esoteric but easier to see concretely in example
+
+- Call $y(t_n)$ the true solution and $y_n$ our approximation, so $y_n \approx y(t_n)$.
+
+- We want to know $E = y(t_n)  - y_n$, or how far off the true solution is from the approximate. This seems hopeless. How do we compute this without knowing the true solution? This is the beauty of numerical analysis.
+
+- Plug in $y(t_n)$ to our update rule supposing we *did* know it, so $$ y_{n+1} = y(t_n) + h f(y(t_n),t_n)$$ note the very important notation! We are not using $y_n$ on the right side, but $y(t_n)$. 
+
+- We also know $f = y’$ so this is $$y_{n+1} = y(t_n)+ h y’(t_n)$$. 
+
+- Next, we can Taylor Series $$ y(t_{n+1}) = y(t_n +h) = y(t_n) + h y’(t_n) + (h^2/2)y''(t_n) + \cdots$$
+
+- How do we put this all together? Back to the error. $E = y(t_{n+1})-y_{n+1}$. This gives us 
+  $$
+  E = y(t_{n+1}) - y_{n+1} \\
+  \approx [y(t_n) + h y'(t_n) + (h^2/2)y''(t_n) + \cdots] - [y(t_n)+hy'(t_n)]\\
+  = (h^2/2)y'' + \cdots
+  $$
+
+- The cancelation is the key step! This says that if we *knew* our true value exactly, the error introduced at each step (local error) scales with $h^2$. Note the $\cdots$ terms are even smaller because we assume $h$ is small. Therefore, we will say the local error of forward Euler is “order” $h^2$ or $\mathcal{O}(h^2)$ where $\mathcal{O}$ has a precise meaning we won’t get into.
+
+- Why is this useful info? It tells us how the error behaves! If we make $h$ 10x smaller, the error gets approximately 100x smaller. 
+
+- Why not always make a small $h$? If we want to solve $t=[0,T]$ then the number of steps is $N=T/h$, so smaller $h$ means more steps.
+
+- Roughly, if we say local error $\approx kh^2$ and $N \approx T/h$, then a crude calculation argues that **global error** $\approx$ # of steps x error at each step, $= (T/h)(kh^2) \approx \mathcal{O}(h)$.
+
+- That is, the *global* error of forward Euler scales with $h$ or “first order”. Intuitively, the global error should be worse than local error.
+
+- As you might guess, this is pretty much the worst performance we could hope for. To make the error 100x smaller, we need to make $h$ 100x smaller. Ideally we want *higher order* methods, where decreasing $h$ helps us more and more.
+
+- Is this the end of the story? No. 
+
+- Consider the “test problem” $y’ = -2.3y$ or really any $y’=\lambda y$ with $\lambda <0$.What should solutions do? Decay!
+
+- But if we choose $h$ too large, not only is the approximation “bad”, we don’t even get qualitative agreement.
+
+  <img src="euler_stab.png" style="width:50%;" />
 
 
 
- 
+- This suggests we need another idea. This is the notion of **numerical stability**. 
