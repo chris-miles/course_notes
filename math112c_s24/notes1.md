@@ -181,12 +181,38 @@ Classify each of the equations as best you can. Discuss with a partner. Some des
 
 - Is this the end of the story? No. 
 
-- Consider the “test problem” $y’ = -2.3y$ or really any $y’=\lambda y$ with $\lambda <0$.What should solutions do? Decay!
+- Consider the “test problem” $y’ = -3y$ or really any $y’=\lambda y$ with $\lambda <0$​.What should solutions do? Decay!
 
-- But if we choose $h$ too large, not only is the approximation “bad”, we don’t even get qualitative agreement.
+- **In-class exercise**: Take that ODE with $h=1$ or $h=2$ and try a few forward Euler steps. What happens? 
+
+- If we choose $h$ too large, not only is the approximation “bad”, we don’t even get qualitative agreement.
 
   <img src="euler_stab.png" style="width:50%;" />
 
 
 
 - This suggests we need another idea. This is the notion of **numerical stability**. 
+- Let’s go back to our test problem $y’ = \lambda y$ with $\lambda <0$. We know the solution is $y = ce^{\lambda t}$ so solutions should decay. We want our numerical scheme to mimic this.
+- What does forward Euler do to our test problem? $y_{n+1} = y_n + h f(y_n, t_n) = y_n + h \lambda y_n = (1+h\lambda) y_n$.
+- So $y_0 =  y_0$, $y_1 = (1+\lambda h) y_0$ $y_2 = (1+\lambda h) y_1 = (1+\lambda h)^2 y_0$. Following this pattern $y_n = (1+\lambda h)^n y_0$. 
+- Easy to plug in to see weird or nice behavior. $\lambda=-3, h=1$ or $h=1/100$. How to generalize?
+-  Geometric series. Convergent if $|1+\lambda h| <1$. 
+- For real $\lambda$: $-1 < 1 + \lambda h < 1$, so  $-2 < \lambda h < 0$  and since $\lambda <0$ the right condition doesn’t matter, just $h < -2/\lambda$. This is our stability condition! Forward Euler is *conditionally stable*!
+- But $|1+\lambda h|<1$ makes sense even for complex $\lambda$. For instance, $\lambda = - 1 + 3i$ has solutions $y = e^{-t}(\cos 3t + \sin 3t)$ so it should still decay. 
+- If we call $z=\lambda h$. What does $|1+z| < 1$ look like in the complex plane? $z= x + iy$. $|z|<1$ is a circle, $|1+z|<1$ is a shifted circle. 
+- What about backward Euler? 
+- $y_{n+1} = y_n + h f(y_{n+1}, t_{n+1})$ with $y’ = \lambda y$ gives us $y_{n+1} = y_n + h\lambda y_{n+1}$. Rearranging, we’ve got $(1-\lambda h)y_{n+1} = y_n$ so $y_{n+1} = y_n/(1-\lambda h)$. 
+- Following the same pattern, $y_n = (1/(1-\lambda h))^n y_0$. So $|1/(1-\lambda h)| < 1$. When does this hold for $\lambda$ real, complex? 
+- For real $\lambda$: $1 < |1-\lambda h|$  so $1-\lambda h > 1$ or $1-\lambda h < -1$. Following the first one gives us $- \lambda h > 0$, always true so the second is irrelevant. Therefore, this is always true. **Backward Euler is unconditionally stable**.
+- In practice? This means we can be very greedy with big step sizes $h$. 
+- For complex $\lambda$: don’t worry about this unless you’re a complex analysis aficionado, but $1<|z|$ is the exterior of a circle, so $1 < |1+z|$ is shifted to the right. But we typically only care about $\Re z <0$ which is completely covered, so we have unconditional stability. 
+- What do I want you to take from this? 
+- **The fundamental theorem**: consistency + stability <-> convergence
+- **consistency** means: local error $\to 0$  as $h \to 0$. roughly, we can make errors as small as you want
+- **stability** informally means: your approximate solution does not accumulate errors.
+- Roughly: for our numerical method to be “good” - we need small errors AND for these errors to not accumulate and grow out of control.
+- Or put another way: consistency says we are well-approximating SOMETHING, and stability says we are approximating the RIGHT thing. Together, we have a GOOD approximation of the RIGHT thing.
+- Next, onto PDES!
+
+### Finite differences for the heat equation
+
