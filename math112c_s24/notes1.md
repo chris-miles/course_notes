@@ -266,7 +266,7 @@ Classify each of the equations as best you can. Discuss with a partner. Some des
 
 - Call $U_i^n$ our grid point so that $U_i^n \approx u(x_i, t_n) = u(nh, tk)$.  
 
-  <img src="C:\Google Drive\github_course_notes\course_notes\math112c_s24\grid.png" style="width:50%;" />
+  <img src="grid.png" style="width:50%;" />
 
   
 
@@ -316,4 +316,21 @@ Classify each of the equations as best you can. Discuss with a partner. Some des
 - **Smaller $h$ requires smaller $k$**. As in, they are linked now! You can’t just take very large $k$ without sacrificing a spatial penalty for stability. 
 
 - Or put another way, if you want high spatial accuracy, you also have to take small temporal steps. Surprising!
+
+```matlab
+
+% --- Assign physical and mesh parameters
+d = 0.1; L = 1; tmax = 2; % Diffusion coefficient, domain length and max time
+dx = L/(nx-1); dt = tmax/(nt-1);
+r = d*dt/dx^2; r2 = 1 - 2*r;
+% --- Assign IC and BC. u is initialized to a vector that includes BC
+x = linspace(0,L,nx)’; u = sin(pi*x/L);
+% --- Loop over time steps
+for k=2:nt
+    uold = u; % prepare for next step
+    for i=2:nx-1
+        u(i) = r*uold(i-1) + r2*uold(i) + r*uold(i+1);
+    end
+end
+```
 
