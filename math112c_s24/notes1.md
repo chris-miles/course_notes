@@ -212,7 +212,108 @@ Classify each of the equations as best you can. Discuss with a partner. Some des
 - **stability** informally means: your approximate solution does not accumulate errors.
 - Roughly: for our numerical method to be “good” - we need small errors AND for these errors to not accumulate and grow out of control.
 - Or put another way: consistency says we are well-approximating SOMETHING, and stability says we are approximating the RIGHT thing. Together, we have a GOOD approximation of the RIGHT thing.
-- Next, onto PDES!
+- Lots of other numerical approaches for ODEs but for now this will do.
+- Both these broad ideas and details of the approaches are helpful for PDEs. 
 
-### Finite differences for the heat equation
+### Finite differences for the PDEs
+
+- There are a few “families” of approaches. 
+- We will focus on **finite difference** approaches that basically follow the same “flavor” as the ODE methods we just discussed. These are the easiest to understand and implement, but are challenging on complex geometries.
+- Other approaches include **finite elements** – widely used in engineering. Better at strange geometries but mathematically a bit tricky, so we won’t touch. But there are good softwares (COMSOL) that implement these for engineers.
+- Finite differences uses a grid. It could be uniform (rectangular), non-uniform, or even some other “mesh”, but uniform rectangular is easiest so we’ll start there.
+- **Key idea** replace derivatives by finite $h$ versions, derived by truncating Taylor series.
+- We already know a few!
+- $\partial_t u \to [u(x,t+k)-u(x,t)]/k$ but this doesn’t need to be only in time, we could also do
+- $\partial_x u \to [u(x+h,t)-u(x,t)]/h$. Note that we need to use different symbols for our grid spacing $\Delta x = k$ and $\Delta t =h$. This is pretty common notation.
+- These were “forward” differences (because we evaluate at values forward of current $(x,t)$ but we could also do backward $\partial_t u \to [u(x,t)-u(x,t-k)]/k$ 
+- Or even centered $\partial_t u \to [u(x, t+k/2) - u(x,t-k/2)]/k$ and this is also reasonable!
+- Notation: $\delta_h^f[u]$ is the forward difference with size $h$. We can also call $\delta_h^b[u]$ backward and $\delta_h^c[u]$ centered. 
+- How do we derive new finite difference schemes? By combining old!
+- **In class activity**: split into 3 groups, each group does one:
+  1. $\delta_{h/2}^c[\delta_{h/2}^c[u]]$​​ 
+  2. $\delta_{f}^c[\delta_{b}^c[u]]$
+  3.  $\delta_{b}^c[\delta_{f}^c[u]]$
+
+- Would we get the same as $\delta_{f}^c[\delta_{f}^c[u]]$? Probably not. This ONLY looks forward. But still a valid approximation!
+
+- All of the 3 I listed give us the same answer, a fundamental approximation called the “center difference scheme for $\partial_{xx}$:
+  $$
+  \partial_{xx} u \to \frac{u(x+h, t)-2u(x,t)+u(x+h,t)}{h^2}
+  $$
+  
+
+- So we have stumbled into lots of options for taking derivatives. How do we make sense of these? Typically people describe a finite difference approximation by two quantities:
+
+- **Direction** (forward, back, central) and **order** (local truncation error scales $h^p$ for order $p$​)
+
+- How do we compute order? The recipe is always take $\text{true} - \text{approx}$ and Taylor expand. Leading order is the order.
+
+- For instance, $E = [u(x+h)-u(x)]/h - u’(x)$ Taylor expand, we get $h^{-1}[u + h u’ + (h^2/2)u'' + \cdots - u]   -u’$
+
+- And of course  this leaves us with $hu'' + \cdots$ so this is a **first order method**. Specifically, we would say “first order forward approximation”
+
+- What about $[u(x+h)-u(x-h)]/[2h] - u’$ ? Expand… and you’ll get $h^2$. This is a “second order central” approximation! 
+
+- Higher order is obviously better. note that if we are moving forward in time $x \to t$ then the central scheme requires us to “look into the future” and probably makes our method implicit. We’ll see more of these tradeoffs.
+
+### Finite difference solution to the heat equation
+
+- Let’s solve our first PDE. We now have finite difference approximations as building blocks and we can put them together. 
+
+- Take $\partial_t u =  D\partial_{xx} u$ with $u(x,0)=g(x)$ and $u(0,t)=A$ and $u(L, t)=B$. 
+
+- Most “standard”scheme is **forward in time, centered in space** (FTCS).
+
+- Call $U_i^n$ our grid point so that $U_i^n \approx u(x_i, t_n) = u(nh, tk)$.  
+
+  <img src="C:\Google Drive\github_course_notes\course_notes\math112c_s24\grid.png" style="width:50%;" />
+
+  
+
+- Now based on the name (FTCS) we can guess the finite difference approximations. 
+
+- $\partial_t u \to [U^{n+1}_j - U^{n}_j] /k$​ 
+
+- $\partial_{xx} \to [U^{n}_{j+1}-2U_j^n+U_{j-1}^n]/(h^2)$
+
+- Putting this together, we have our first numerical scheme for the heat equation:
+  $$
+  \frac{U_j^{n+1}-U_j}{k} = D \frac{U_{j+1}^n-2U_j^n+U_{j-1}}{h^2}
+  $$
+
+- Now there are many questions we could ask.
+
+  - How do we actually solve this (or program it into a computer)?
+  - Did we forget to incorporate any info about our problem in this scheme? (hint, what else do we know?)
+  - What is the error of this scheme? (is it consistent?)
+  - Is this a stable scheme? (in the ODE sense – if we expect solutions to decay, they actually do)
+
+- Let’s start with the first point. Note we can rearrange this to be
+  $$
+  U_{j}^{n+1} = U_j^n + \frac{Dk}{h^2}[U_{j+1}^n + U_{j-1}^n-2U_j^n]
+  $$
+
+- Now we can march forward in time $n=0, n=1, \ldots$. 
+
+- But what do we start with? Now we need our boundary/initial conditions!
+
+- $u(x,0) = g(x)$ Discretize this so that $g(x_i) = g_i$ and we can take $U_j^n = g_j$. 
+
+- We haven’t touched boundary conditions quite yet… But we will later.
+
+- Next, what about accuracy? Same idea as ODEs. Local truncation error is true - exact and then we Taylor expand. Or a shortcut!
+
+- Just look at numerical scheme. $S(x,t) = \frac{u(x,t+k)-u(x,t)}{k} - \frac{D}{h^2}[u(x+h,t)-2u(x,t)+u(x-h,t)]$​. If our method was exact, $S$​ should be zero. But it’s not, so anything left over is error. 
+
+- Taylor expand, and use PDE, and you’re left with $S(x,t) \sim \alpha k^1 + \beta h^2$ so this method is $\mathcal{O}(k+h^2)$ or “first order in time, second order in space”.
+
+- Stability is much harder. I will do a sketch for intuition here and homework will be doing the “proper” way.
+
+- Roughly our method looks like $\text{new} = (1-(2Dk)/h^2) \text{old}$ or at least that’s roughly how much each $U_i^n$​ gets updated. 
+
+- So $|1 - (2Dk)/h^2|<1$ and rearrange, we get $Dk/h^2<1$​. This is the right intuition. 
+
+- **Smaller $h$ requires smaller $k$**. As in, they are linked now! You can’t just take very large $k$ without sacrificing a spatial penalty for stability. 
+
+- Or put another way, if you want high spatial accuracy, you also have to take small temporal steps. Surprising!
 
