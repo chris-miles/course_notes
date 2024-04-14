@@ -215,7 +215,7 @@ Classify each of the equations as best you can. Discuss with a partner. Some des
 - Lots of other numerical approaches for ODEs but for now this will do.
 - Both these broad ideas and details of the approaches are helpful for PDEs. 
 
-### Finite differences for the PDEs
+### Finite differences & PDEs
 
 - There are a few “families” of approaches. 
 - We will focus on **finite difference** approaches that basically follow the same “flavor” as the ODE methods we just discussed. These are the easiest to understand and implement, but are challenging on complex geometries.
@@ -386,7 +386,7 @@ end
 
 - There are also subtleties about how the “order” of the global error. If we choose a very crude approximation to the boundary condition but a very accurate PDE approximation, who wins? Usually the crudest limits everything.
 
-#### Finite differences for 2D Poisson
+### Finite differences for 2D Poisson
 
 - The heat equation is a nice “model problem” to show off finite differences. I want to briefly show off one more to convey some other technical annoyances that can pop up. 
 
