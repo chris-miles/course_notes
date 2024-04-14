@@ -241,7 +241,6 @@ Classify each of the equations as best you can. Discuss with a partner. Some des
   \partial_{xx} u \to \frac{u(x+h, t)-2u(x,t)+u(x+h,t)}{h^2}
   $$
   
-
 - So we have stumbled into lots of options for taking derivatives. How do we make sense of these? Typically people describe a finite difference approximation by two quantities:
 
 - **Direction** (forward, back, central) and **order** (local truncation error scales $h^p$ for order $p$​)
@@ -302,29 +301,25 @@ Classify each of the equations as best you can. Discuss with a partner. Some des
 - We haven’t touched boundary conditions quite yet… But we will later.
 
 - Next, what about accuracy? Same idea as ODEs. Local truncation error is true - exact and then we Taylor expand. Or a shortcut!
-
 - Just look at numerical scheme. $S(x,t) = \frac{u(x,t+k)-u(x,t)}{k} - \frac{D}{h^2}[u(x+h,t)-2u(x,t)+u(x-h,t)]$​. If our method was exact, $S$​ should be zero. But it’s not, so anything left over is error. 
-
 - Taylor expand, and use PDE, and you’re left with $S(x,t) \sim \alpha k^1 + \beta h^2$ so this method is $\mathcal{O}(k+h^2)$ or “first order in time, second order in space”.
-
 - Stability is much harder. I will do a sketch for intuition here and homework will be doing the “proper” way.
-
 - Roughly our method looks like $\text{new} = (1-(2Dk)/h^2) \text{old}$ or at least that’s roughly how much each $U_i^n$​ gets updated. 
-
 - So $|1 - (2Dk)/h^2|<1$ and rearrange, we get $Dk/h^2<1$​. This is the right intuition. 
-
 - **Smaller $h$ requires smaller $k$**. As in, they are linked now! You can’t just take very large $k$ without sacrificing a spatial penalty for stability. 
-
 - Or put another way, if you want high spatial accuracy, you also have to take small temporal steps. Surprising!
 
-```matlab
+#### Practical aspects of finite differences (on the heat equation)
 
+```matlab
 % --- Assign physical and mesh parameters
-d = 0.1; L = 1; tmax = 2; % Diffusion coefficient, domain length and max time
+D = 0.1; L = 1; tmax = 2; % Diffusion coefficient, domain length and max time
 dx = L/(nx-1); dt = tmax/(nt-1);
-r = d*dt/dx^2; r2 = 1 - 2*r;
+r = D*dt/dx^2; r2 = 1 - 2*r;
+A=0; B=0;
 % --- Assign IC and BC. u is initialized to a vector that includes BC
 x = linspace(0,L,nx)’; u = sin(pi*x/L);
+u(0)=A; u(end)=B;
 % --- Loop over time steps
 for k=2:nt
     uold = u; % prepare for next step
@@ -334,3 +329,114 @@ for k=2:nt
 end
 ```
 
+- Back to solving… On the homework, we have “periodic” boundary conditions, which means that $u(-1,t)=u(1,t)$​. This is like solving the heat equation on a ring.
+- In class, we discussed the “easiest” case of Dirichlet boundaries $u(-1,t)=A$ because we can just set $U_0^n=A$ and no need to ever solve for it. 
+
+- I won’t tell you how to implement periodic, but let’s look at another boundary condition. What if we had something like $\partial_x u (0,t)=A$?  This is a little tough because we don’t know what $U_0^n$ is any more. 
+
+- Finite difference! $\frac{U_1^n-U_0^n}{h} = A$, so this says that $U_0^n=hA - U_1^n$. We can just use this as the update rule for $U_0$ rather than the “PDE” update rule from FTCS. 
+
+- For the homework, periodic boundary conditions work a little different… You still want to use the PDE update rule, but for, say, updating $U_0^n$, what is $U_{-1}^n$​?  
+
+- Back to actually programming this. I give some MATLAB code above. But I would say this is a “crude” implementation. In practice, people do not use a “for” loop often to loop over points. Instead, we want to exploit the linearity of this approach to write this as a matrix/vector operation.
+
+- First, note that we can write our PDE update rule in terms of $\lambda$ as $\lambda = Dk/h^2$ and then
+  $$
+  U_{j}^{n+1} = \lambda U_{j+1}^n + (1-2\lambda) U_{j}^n + U_{j-1}^n
+  $$
+
+- Now if we think of each $U^n = [U_j^n] = [U_1^n,U_2^n,\ldots,U_M^n]$, a vector, we can write this as a matrix operation
+  $$
+  U^{n+1} = \begin{bmatrix}1-2\lambda&\lambda&0&\ldots &0\\\lambda&1-2\lambda&\lambda&\ddots &\vdots \\0&\ddots &\ddots &\ddots &0\\\vdots &&\lambda&1-2\lambda&\lambda\\0&\ldots &0&\lambda&1-2\lambda \end{bmatrix} \begin{bmatrix}U_1^n\\ U_2^n \\  \vdots \\  U_{M-1}^n\end{bmatrix}
+  $$
+
+- This is great news! Neglecting boundary conditions, this says we can update all our grid points by the simple matrix multiplication $U^{n+1}=L U^n$​. 
+
+- Note this is called a “tridiagonal matrix”. Why? The $j$th row only has 3 values, which depend on the $j$, $j+1$ and $j-1$ rows. 
+
+- So how do we handle boundaries? Let’s look into $u(0,t)=A$ and $u(L,t)=B$ for now.
+
+- In our discretization, this is simply $$U_1^n = (1-2\lambda)U_1^n + \lambda U_0^n + \lambda U_2^n$$   =$ (1-2\lambda)U_1^n + \lambda A + \lambda U_2^n  $. And similarly, $U_{M-1}^n = (1-2\lambda) U_{m-1}^n + \lambda B+\lambda U_{m-2}^n$​. 
+
+- If you squint at our matrix equation and how it handles these rows, we see all that is missing are these constant values, so we can actually just modify our system to be 
+  $$
+  U^{n+1} = \begin{bmatrix}1-2\lambda&\lambda&0&\ldots &0\\\lambda&1-2\lambda&\lambda&\ddots &\vdots \\0&\ddots &\ddots &\ddots &0\\\vdots &&\lambda&1-2\lambda&\lambda\\0&\ldots &0&\lambda&1-2\lambda \end{bmatrix} \begin{bmatrix}U_1^n\\ U_2^n \\  \vdots \\  U_{M-1}^n\end{bmatrix} + \begin{bmatrix} \lambda A \\ 0 \\ \vdots \\ 0 \\ \lambda B \end{bmatrix}.
+  $$
+
+- And you can easily double check this recovers exactly what we are hoping for. (Try the top row, for instance. )
+
+- Another option is to “extend” the linear system so that we now include $U_0$ and $U_M$ in the vector of unknowns. But we know it doesn’t change at any time step, so its update rule is quite easy, it’s just $U^{n+1}_0 = U^{n}_0$. So this gives us the new linear system.
+  $$
+  U^{n+1} = \begin{bmatrix}1&0 &\cdots &\ldots &0\\\lambda&1-2\lambda&\lambda&\ddots &\vdots \\0&\ddots &\ddots &\ddots &0\\\vdots &&\lambda&1-2\lambda&\lambda\\0&\cdots  & \cdots &0&1 \end{bmatrix} \begin{bmatrix}U_0^n \\ U_1^n\\ U_2^n \\  \vdots \\  U_{M-1}^n \\ U_M^n\end{bmatrix}
+  $$
+
+- Either method is totally kosher. But you should be skeptical: how well does each generalize? 
+
+- Take for instance, $\partial_x u(0,t)=A$. We saw earlier this boils down to $U_0^n = hA - U_1^n$.  So this means we could take our system to be, just modifying the first row *and* adding
+  $$
+  U^{n+1} = \begin{bmatrix}0 & -1 &\cdots &\ldots &0\\\lambda&1-2\lambda&\lambda&\ddots &\vdots \\0&\ddots &\ddots &\ddots &0\\\vdots &&\lambda&1-2\lambda&\lambda\\0&\cdots  & \cdots &0&1 \end{bmatrix} \begin{bmatrix}U_0^n \\ U_1^n\\ U_2^n \\  \vdots \\  U_{M-1}^n \\ U_M^n\end{bmatrix} + \begin{bmatrix} hA \\ 0 \\ \vdots \end{bmatrix}.
+  $$
+  
+
+- So that gives you an idea of how you could solve the heat equation with finite differences. Where do we go from here?
+
+- Some broader notes: we made lots of decisions that could have been adjusted for various consequences.
+
+- For instance, if we chose a different approximation for $\partial_t$ or $\partial_{xx}$ we might be able to improve the “order” of the method (local truncation error), or stability (say, by making an implicit method). I presented the simplest possible thing here. 
+
+- There are also subtleties about how the “order” of the global error. If we choose a very crude approximation to the boundary condition but a very accurate PDE approximation, who wins? Usually the crudest limits everything.
+
+#### Finite differences for 2D Poisson
+
+- The heat equation is a nice “model problem” to show off finite differences. I want to briefly show off one more to convey some other technical annoyances that can pop up. 
+
+- Suppose we have the 2D Poisson equation 
+  $$
+  \nabla^2 u = \nabla \cdot \nabla u = \frac{\partial^2 u}{\partial y^2} + \frac{\partial^2 u}{\partial x^2}=f(x,y), \ \ \ (x,y) \in \Omega=(0,1)\times (0,1),
+  $$
+
+- What does this physically represent? One idea is the ‘steady state’ heat being forced by $f(x,y)$. This also shows up a ton in fluids, electromagnetism. 
+
+- $u_{xx}\approx \frac{1}{h^2}(u_{i+1j}-2u_{ij}+u_{i-1j})$  and $u_{yy}\approx \frac{1}{h^2}(u_{ij+1}-2u_{ij}+u_{ij-1}). $
+
+- So putting this together our PDE becomes
+  $$
+  \begin{equation}-(u_{i-1j}+u_{ij-1}-4u_{ij}+u_{ij+1}+u_{i+1j})=h^2f_{ij} \end{equation}
+  $$
+  
+
+- How do we do this? 
+  $$
+  \begin{equation} T=\left(\begin{array}{ccccccc}
+  -4&1&0&\cdots & \\
+  1&-4&1&0&\\
+  0&\ddots &\ddots &\ddots \\
+  ..&0&1&-4&1\\
+  0 &\cdots&  0&1&-4\\
+  \end{array}\right)
+  \end{equation}
+  $$
+
+- But then there is a question of how we number our grid. “Block diagonal”
+  $$
+  \begin{equation} A =\left(\begin{array}{ccccccc}
+  T&I&0&\cdots & \\
+  I&T&I&0&\\
+  0&\ddots &\ddots &\ddots \\
+  \cdots&0&I&T&I\\
+   &\cdots&  0&I&T\\
+  \end{array}\right)
+  \end{equation}
+  $$
+
+- where $I$ is an $N-1 \times N-1$ identity matrix. Where does this come from? Image how we number our grid. 
+
+  <img src="2d_to_1d.png" style="width:80%;" />
+
+  *(Note I think this diagram is a “upside down” but it was the best I could find on the internet)*
+
+- This matrix is often called the “discrete Laplacian” for obvious reasons. The idea can be extended quite generally, even to graphs and other objects. 
+
+- Note here we just have *one* linear system for our unknowns. $LU = F$. Your whole linear algebra class has been preparing you for this moment! It turns out there are very nice ways to solve this that exploit the tri-diagonal or similar structure. For our class, MATLAB backslash is fine.
+
+  
