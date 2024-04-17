@@ -312,24 +312,34 @@ Classify each of the equations as best you can. Discuss with a partner. Some des
 #### Practical aspects of finite differences (on the heat equation)
 
 ```matlab
+% heat eqn with a for loop
+clear all; close all;
 % --- Assign physical and mesh parameters
+nt=500; nx=20;
 D = 0.1; L = 1; tmax = 2; % Diffusion coefficient, domain length and max time
 dx = L/(nx-1); dt = tmax/(nt-1);
 r = D*dt/dx^2; r2 = 1 - 2*r;
 A=0; B=0;
 % --- Assign IC and BC. u is initialized to a vector that includes BC
-x = linspace(0,L,nx)’; u = sin(pi*x/L);
-u(0)=A; u(end)=B;
+x = linspace(0,L,nx)'; u = sin(pi*x/L);
+u(1)=A; u(end)=B;
+figure;
 % --- Loop over time steps
 for k=2:nt
     uold = u; % prepare for next step
     for i=2:nx-1
         u(i) = r*uold(i-1) + r2*uold(i) + r*uold(i+1);
     end
+    if mod(k,10) == 0 % plot every 10 frames
+        hold on;
+        plot(x,u);
+        drawnow;
+    end
 end
 ```
 
 - Back to solving… On the homework, we have “periodic” boundary conditions, which means that $u(-1,t)=u(1,t)$​. This is like solving the heat equation on a ring.
+
 - In class, we discussed the “easiest” case of Dirichlet boundaries $u(-1,t)=A$ because we can just set $U_0^n=A$ and no need to ever solve for it. 
 
 - I won’t tell you how to implement periodic, but let’s look at another boundary condition. What if we had something like $\partial_x u (0,t)=A$?  This is a little tough because we don’t know what $U_0^n$ is any more. 
@@ -365,6 +375,36 @@ end
 
 - And you can easily double check this recovers exactly what we are hoping for. (Try the top row, for instance. )
 
+  ```matlab
+  % heat eqn with a matrix
+  clear all; close all;
+  % --- Assign physical and mesh parameters
+  nt=500; nx=20;
+  D = 0.1; L = 1; tmax = 2; % Diffusion coefficient, domain length and max time
+  dx = L/(nx-1); dt = tmax/(nt-1);
+  r = D*dt/dx^2; r2 = 1 - 2*r;
+  A=0; B=0;
+  % --- Assign IC and BC. u is initialized to a vector that includes BC
+  x = linspace(0,L,nx)'; u = sin(pi*x/L);
+  u(1)=A; u(end)=B;
+  L = r2*diag(ones(nx-2,1),0) + r*diag(ones(nx-3,1),1) + r*diag(ones(nx-3,1),-1);
+  disp(L)
+  figure;
+  % --- Loop over time steps
+  for k=2:nt
+      uold = u; % prepare for next step
+      u_interior = L*uold(2:end-1);
+      u = [A; u_interior; B];
+      if mod(k,10) == 0 % plot every 10 frames
+          hold on;
+          plot(x,u);
+          drawnow;
+      end
+  end
+  ```
+
+  
+
 - Another option is to “extend” the linear system so that we now include $U_0$ and $U_M$ in the vector of unknowns. But we know it doesn’t change at any time step, so its update rule is quite easy, it’s just $U^{n+1}_0 = U^{n}_0$. So this gives us the new linear system.
   $$
   U^{n+1} = \begin{bmatrix}1&0 &\cdots &\ldots &0\\\lambda&1-2\lambda&\lambda&\ddots &\vdots \\0&\ddots &\ddots &\ddots &0\\\vdots &&\lambda&1-2\lambda&\lambda\\0&\cdots  & \cdots &0&1 \end{bmatrix} \begin{bmatrix}U_0^n \\ U_1^n\\ U_2^n \\  \vdots \\  U_{M-1}^n \\ U_M^n\end{bmatrix}
@@ -377,7 +417,6 @@ end
   U^{n+1} = \begin{bmatrix}0 & -1 &\cdots &\ldots &0\\\lambda&1-2\lambda&\lambda&\ddots &\vdots \\0&\ddots &\ddots &\ddots &0\\\vdots &&\lambda&1-2\lambda&\lambda\\0&\cdots  & \cdots &0&1 \end{bmatrix} \begin{bmatrix}U_0^n \\ U_1^n\\ U_2^n \\  \vdots \\  U_{M-1}^n \\ U_M^n\end{bmatrix} + \begin{bmatrix} hA \\ 0 \\ \vdots \end{bmatrix}.
   $$
   
-
 - So that gives you an idea of how you could solve the heat equation with finite differences. Where do we go from here?
 
 - Some broader notes: we made lots of decisions that could have been adjusted for various consequences.
@@ -404,7 +443,6 @@ end
   \begin{equation}-(u_{i-1j}+u_{ij-1}-4u_{ij}+u_{ij+1}+u_{i+1j})=h^2f_{ij} \end{equation}
   $$
   
-
 - How do we do this? 
   $$
   \begin{equation} T=\left(\begin{array}{ccccccc}
