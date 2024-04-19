@@ -56,10 +56,6 @@ Classify each of the equations as best you can. Discuss with a partner. Some des
 3. $$u_t - u_{xx} = ru(1-u), \quad u(x,0) = g(x), \quad x \in \mathbb{R}.$$​
 4. $${\displaystyle {\frac {\partial }{\partial t}}(\rho \mathbf {u} )+\nabla \cdot \left(\rho \mathbf {u} \otimes \mathbf {u} +[p-\zeta (\nabla \cdot \mathbf {u} )]\mathbf {I} -\mu \left[\nabla \mathbf {u} +(\nabla \mathbf {u} )^{\mathrm {T} }-{\tfrac {2}{3}}(\nabla \cdot \mathbf {u} )\mathbf {I} \right]\right)=\rho \mathbf {g} .}$$​ 
 
----
-
-
-
 ## Part 1, Intro to Numerical Methods for ODEs & PDEs
 
 - We will first start with the basics of numerically solving ODEs and use these techniques as "building blocks" for eventually solving PDEs. 
@@ -97,7 +93,7 @@ Classify each of the equations as best you can. Discuss with a partner. Some des
 
 - Since we know the initial value $y_0$​, we can continually use this update rule in a "for loop".
 
-  <img src="euler.png" alt="w" style="width:50%;" />
+  <img src="euler.png" alt="w" style="width:40%;" />
 
 - Just because we *can* do this, doesn't mean we *should*. That is, whenever you approximate something, you should always follow this with asking: *how good of an approximation is this?* 
 
@@ -475,6 +471,75 @@ end
 
 - This matrix is often called the “discrete Laplacian” for obvious reasons. The idea can be extended quite generally, even to graphs and other objects. 
 
-- Note here we just have *one* linear system for our unknowns. $LU = F$. Your whole linear algebra class has been preparing you for this moment! It turns out there are very nice ways to solve this that exploit the tri-diagonal or similar structure. For our class, MATLAB backslash is fine.
+- Note here we just have *one* linear system for our unknowns. $LU = F$​. Your whole linear algebra class has been preparing you for this moment! It turns out there are very nice ways to solve this that exploit the tri-diagonal or similar structure. For our class, MATLAB backslash is fine.
+
+- **Broader outlook.** After this part of the class, we now know the rough idea of how to numerically solve basically any PDE. For instance, if I gave you the following: what would you do? $$\partial_t u =  \partial_{xx}u - u^2 + u$$​.
+
+- Something like $(U_j^{n+1}-U_j^n)/k = (U_{j-1}^n - 2U_j^n + U_{j+1}^n)/h^2-{(U_{j}^{n})}^{2}+U_j^n$. 
+
+## Reaction-diffusion equations (PDEs in biology)
+
+- Before we start: you should try to brainstorm. Are there any phenomena in biology that you think are appropriately modeled by PDEs? What features do they have?
+- Typically it is: things changing in *space* and *time*. Often this is physical space, but "space" could also be more abstract, like $x$ could represent a particular set of genes.
+- The equations we'll talk about for a week or two are **reaction-diffusion equations**. 
+- We already know the diffusion equation (in 1D): $\partial_t u = \partial_{xx}u$. This represents the concentration (density) of some thing (a cell, a molecule) undergoing spatial diffusion. 
+- Diffusion on its own its not that interesting. It basically just "fills in" areas of low concentration. That is, concentration flows from low to high.
+- Often in biology, things don't just move around - they interact, undergo changes, and other activities. 
+- The interplay between motion and these "reactions" are key to understanding life. 
+- Generically, we are going to study things that look like $\partial_t u = D\partial_{xx} u + F(u)$. Even though this looks relatively simple, this can display a huge array of exotic behaviors.  Especially interesting cases are when $F$ is non-linear and/or $u$ is actually a vector (so we have multiple coupled PDEs).
+
+### Basic reaction-diffusion equations
+
+- Take for instance, $\partial_t u = D\partial_{xx} u -au $. 
+- What does this physically represent? We can write a reaction $U \overset{a}{\to} \varnothing$ to mean a chemical reaction where a molecule "U" becomes "nothing" at rate $a$. This is called "decay" or "death".
+- This is linear! We can actually solve this using the methods of 112A and B. Separation of variables (finite domain). Fourier transform (infinite domain). For $u(x,0)=\delta(x)$, you get something like $u(x,t)= \frac{u_0}{\sqrt{4Dt}}\exp(-x^2/(4DT)-a t)$. We can see this spreads out and decays, with $a$​ controls how much it decays.  
+- What if we did $\partial_t u = D\partial_{xx} u +au $? This is just birth, $\varnothing \overset{a}{\to} U$ and the solution we can see by flipping the sign $u(x,t)= \frac{u_0}{\sqrt{4Dt}}\exp(-x^2/(4DT)+a t)$. Not very interesting behavior either. Just growth. 
+- What can we gain from this lesson? We really need non-linearities for more interesting behavior to happen.
+- Plus we know how reproduction happens. It's rarely that something just spontaneously exists, with no infleunce from its surroundings or other things. 
+
+### Fisher-KPP equation
+
+- Fisher, Kolmogorov, Petrovsky, Pisconov. Two independent publications in 1937. 
+
+- The PDE we will study next is
+  $$
+  \partial_t u = \partial_xx u + u - u^2.
+  $$
+
+- Where does this come from? Take the ODE for growth with carrying capacity, $u' = ru$ (unbounded growth), and then $u' =ru (1-u/K)$. So as $u\to K$. Always a stable equilibrium.
+
+- In other words, birth "rate" is $r(1-u/k)$. As in, birth rate depends on the rest of the population! This is where non-linearity comes from. "Feedback"
+
+- So how do we get Fisher-KPP? 
+
+- Take $\partial_t u = D\partial_{xx} u  + ru(1-u/k) = D\partial_{xx} + \alpha u - \beta u^2$. We could study this but it's messy. Call $v=(\alpha/\beta)u$ $\tau = \sqrt{\alpha} t$ and $y = \sqrt{\alpha/D} x$.
+
+- You can check $\alpha$ must have units of time. So $y,\tau$ are unitless. This process is called "non-dimensionalization".
+
+- Mechanically, it's easy $\partial u \partial t = (\partial u /\partial\tau)(\partial \tau / \partial_t) =\alpha \partial_\tau u $​. 
+
+- And by this $\partial_{xx}u = (\alpha/D)\partial_{yy}u$. So plugging this all together, we get $(\alpha/\beta)\partial_\tau u $$= (\alpha/\beta)\partial_{yy}u +$$ (\alpha/\beta)u-(\alpha/\beta)^2u^2$ and of course this is just $\partial_\tau v = \partial_{yy}v + v - v^2$. But since we are lazy we will go back to writing $x,t, u$​.  
+
+- Here is another derivation, from epidemiology. 
+
+- $S + I \overset{\alpha}{\to} SI$. "SI" model for infectious disease. In this model, everyone is either succeptible or infected. (No recovered, dead, etc).
+  $$
+  \partial_t s = D_s \partial_{xx}s -\alpha si \\
+  \partial_t i = D_i \partial_{xx}i +\alpha si.
+  $$
+
+- But note, this has a "conservation law". Since the whole population is conserved, $i+s = s_0$, so $s=s_0-i$. 
+
+- Plug this in: $\partial_t i = D_i \partial_{xx} i + \alpha i (s_0-i)$. 
+
+- The constants are a little different but this is exactly Fisher KPP! 
+
+- So we should think about this as a "growing population" that is limited by some resource. 
+
+- What behavior do we expect from this? What does diffusion do? Spreads out slowly. Is that what the population does? No! Traveling waves from diffusion. Surprising!
+
+  <img src="fisher_kpp.jpg" alt="fisher_kpp" style="width:44%;" />
+
+- How fast is the wave moving? Leads to very interesting math. Coming up next!
 
   
