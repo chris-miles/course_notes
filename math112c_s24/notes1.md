@@ -477,7 +477,7 @@ end
 
 - Something like $(U_j^{n+1}-U_j^n)/k = (U_{j-1}^n - 2U_j^n + U_{j+1}^n)/h^2-{(U_{j}^{n})}^{2}+U_j^n$. 
 
-## Reaction-diffusion equations (PDEs in biology)
+## Part 2, Reaction-diffusion equations (PDEs in biology)
 
 - Before we start: you should try to brainstorm. Are there any phenomena in biology that you think are appropriately modeled by PDEs? What features do they have?
 - Typically it is: things changing in *space* and *time*. Often this is physical space, but "space" could also be more abstract, like $x$ could represent a particular set of genes.
@@ -577,7 +577,6 @@ end
   J(U,V) = \begin{bmatrix} \partial_U f & \partial_V f\\ \partial_U g & \partial_V g\end{bmatrix} = \begin{bmatrix} 0 & -1/c\\ c(1-2U) & -c \end{bmatrix}.
   $$
   
-
 - The eigenvalues of this matrix satisfy $\lambda^2 + c\lambda + 1-2U =0$ so 
 
   $$\lambda = -\frac{c}{2}\pm \frac{1}{2}\sqrt{c^2-4(1-2U)}$$. 
@@ -594,7 +593,7 @@ end
 
   
 
-### Pattern Formation 
+### (Turing) Pattern Formation 
 
 - “Inventor” of this theory was Alan Turing – Benedict Cumberbatch from Imitation Game. 
 
@@ -649,7 +648,6 @@ end
   \begin{bmatrix} \tilde{u}(x,t) \\ \tilde{v}(x,t) \end{bmatrix} = \begin{bmatrix}\alpha \\ \beta\end{bmatrix} e^{\lambda t} e^{ikx}
   $$
   
-
 - Why this form? Remember this is like Homework 2 stability (of a numerical method). We know $e^{ikx}$ are basically sines/cosines that showed up everywhere in 112A/B. This tells us whether a particular sine/cosine will grow or shrink. 
 
 -  Plugging this in, we get the equation
