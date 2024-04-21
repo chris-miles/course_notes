@@ -542,4 +542,142 @@ end
 
 - How fast is the wave moving? Leads to very interesting math. Coming up next!
 
+### Wave speed in Fisher-KPP
+
+- I am choosing this example to spend a bit more time on because I think it’s “classical” and beautiful, not necessarily the most important topic in PDEs.
+
+- In general, we are left with the feeling of surprise that a diffusion equation can have traveling waves. 
+
+- It might physically represent how quickly a tumor is spreading, or an invasive species is invading.
+
+- There are many reasons we want to know the speed. 
+
+- Take the parameters $\partial_t u = \partial_{xx}u - u^2 + u$. 
+
+- Guess a traveling wave solution $U(z)$, where $z=x-ct$  We don’t know the speed $c$​ yet but we get by noting that $\partial_t u = \partial_z u  \cdot \partial_t z = -c \partial_z U$ and similar for the $x$ derivative 
+  $$
+  \frac{d^2U}{dz^2} + c \frac{dU}{dz} + U(1-U) = 0.
+  $$
+
+- In other words, we have transformed our PDE problem into an ODE problem.
+
+- 2nd order. Let’s do the trick to turn into 1st order. Call $V=cU’$ then our system becomes 
+  $$
+  V' = - c[V+U(1-U)], \qquad U' = V/C.
+  $$
+
+- How did you study non-linear ODEs (in 3D, 113, etc)? “Nullclines” – set both ODEs to zero. Find where these curves intersect. 
+
+- The first nullcline is easy. For $U’=0$ we just get $V=0$. 
+
+- The second is tougher. $V’=0$ means $V+U(1-U)=0$. Or $V=-U(1-U)$. A quadratic! With zeros through $U=0$ and $U=1$. 
+
+- If we call $U’=f(U,V), V’=g(U,V)$ We just found the nullclines by setting $0=f(U,V)$ and $0=g(U,V)$. Now we find their stability by the Jacobian
+  $$
+  J(U,V) = \begin{bmatrix} \partial_U f & \partial_V f\\ \partial_U g & \partial_V g\end{bmatrix} = \begin{bmatrix} 0 & -1/c\\ c(1-2U) & -c \end{bmatrix}.
+  $$
   
+
+- The eigenvalues of this matrix satisfy $\lambda^2 + c\lambda + 1-2U =0$ so 
+
+  $$\lambda = -\frac{c}{2}\pm \frac{1}{2}\sqrt{c^2-4(1-2U)}$$. 
+
+- At $U=1$ $c^2-4(1-2U)= c^2+2$. So we have one positive, one negative eigenvalue, a saddle.
+
+- At $U=0$ $\lambda=-c/2 \pm (1/2)\sqrt{c^2-4}$. If $c^2>4$ we have two negative eigenvalues (stable) and if $c^2<4$ we have complex eigenvalues.
+
+- Therefore we see $c=2$​ is the “critical” wave speed! 
+
+- Computing the “actual” wave speed is more challenging, but this is still very informative. 
+
+  <img src="kpp_phase.png" alt="" style="width:80%;" />
+
+  
+
+### Pattern Formation 
+
+- “Inventor” of this theory was Alan Turing – Benedict Cumberbatch from Imitation Game. 
+
+- Big question: how does nature form patterns? Leopard spots. Zebra stripes. Sea shell swirls.
+
+- His idea: the thing we are pursuing is a “diffusion driven instability” – a pattern caused by diffusion. This was a shocking idea because diffusion was thought to have a “stabilizing” effect – it smooths out any spatial structures! 
+
+- The idea itself gives us a concrete recipe to look for the conditions: model without diffusion -> stable, model with diffusion -> unstable behavior. 
+
+- The first observation: one species is not enough!
+
+- Consider $\partial_t u = D \partial_{xx} u + F(u)$. Call $u_0$ the value that $f(u_0)=0$. Now we want to “perturb” this state, so take $u(x,t) = u_0 +  \tilde{u}(x,t)$​. 
+
+- You can think of the perturbation as a little tiny poke in space. If we have instability: this should grow.
+
+- What is the behavior of $\tilde{u}$? Plug in, and we get $\partial_t \tilde{u} = D \partial_{xx}\tilde{u} + f(u_0 +  \tilde{u})$ 
+
+- But if $\tilde{u}$ is tiny, then we can Taylor expand and we get $f(u_0 +  \tilde{u}) \approx f(u_0) + \tilde{u}f’(u_0)$ and now our PDE becomes
+  $$
+  \partial_t \tilde{u} = D\partial_{xx}u + \tilde{u} \underbrace{f'(u_0)}_{\alpha}
+  $$
+
+- This procedure is called “linearizing” around the steady state, because we get a linear reaction term. We already know the behavior of this PDE. If $\alpha>0$ it grows, if $\alpha<0$ it decays. Independent of $D$. This is not what we want!
+
+- Therefore, we need 2 species. 
+  $$
+  \partial_t u &= D_u \partial_{xx}u + f(u,v)\\
+  \partial_t v &= D_v \partial_{xx}v + g(u,v).
+  $$
+
+- We’ll call the steady-state (spatially uniform) $f(u_0,v_0)=0$ and $g(u_0,v_0)=0$​. 
+
+- Same idea. We’ll do a perturbation around this spatially uniform state. So take $u(x,t) = u_0 + \tilde{u}(x,t)$ and $v(x,t)=v_0+\tilde{v}(x,t)$​ . 
+
+- Following the same linearization idea , we get 
+  $$
+  \partial_t \begin{bmatrix} \tilde{u} \\ \tilde{v} \end{bmatrix} = \begin{bmatrix} D_u \partial_{xx} \tilde{u} \\ D_v \partial_{xx} \tilde{v}  \end{bmatrix} + \begin{bmatrix} \partial_u f(u_0,v_0) & \partial_v f(u_0,v_0)\\ \partial_u g(u_0,v_0) & \partial_v g(u_0,v_0)\end{bmatrix}\begin{bmatrix}\tilde{u}\\ \tilde{v}\end{bmatrix}.
+  $$
+
+- The Jacobian matrix shows up again! 
+
+- If $D_u$, $D_v$=0 this is just an ODE system. 
+
+- We can compute the eigenvalues of $J$. But there is a cute trick relating the trace and determinant. Notaby, $T=\operatorname{tr} J = f_u + g_v$ and $D= \det J = f_u g_v - f_v g_u$​. Then the eigenvalues are $\lambda = (1/2)(T\pm\sqrt{T-4D})$. 
+
+- We need these to be stable, so we want the real part of our roots to be negative. 
+
+- This boils down to $T<0$ and $D >0$. Or more concretely, $f_u + g_v <0 $ and $f_u g_v - f_v g_u>0$​. This is a requirement for there to be stability without diffusion! A key ingredient for patterns. 
+
+- Now we remember the other half: we want *instability* with diffusion. Let’s take the “ansatz” (a name for an educated guess) for our perturbation: 
+  $$
+  \begin{bmatrix} \tilde{u}(x,t) \\ \tilde{v}(x,t) \end{bmatrix} = \begin{bmatrix}\alpha \\ \beta\end{bmatrix} e^{\lambda t} e^{ikx}
+  $$
+  
+
+- Why this form? Remember this is like Homework 2 stability (of a numerical method). We know $e^{ikx}$ are basically sines/cosines that showed up everywhere in 112A/B. This tells us whether a particular sine/cosine will grow or shrink. 
+
+-  Plugging this in, we get the equation
+  $$
+  \partial_t \begin{bmatrix} \tilde{u}(x,t) \\ \tilde{v}(x,t) \end{bmatrix} =  \begin{bmatrix}f_u - k^2 D_u & f_v \\ g_u & g_v - k^2 D_v \end{bmatrix} \begin{bmatrix} \tilde{u}(x,t) \\ \tilde{v}(x,t) \end{bmatrix}
+  $$
+
+- Again, we have “linearized”! A very powerful idea. But we see the role of space now: the $k^2$ terms are new compared to the ODE. 
+
+- We want *instability* so we want the real part of the eigenvalues to be positive. That means $\det H <0$ (where $H$ is that matrix), so
+  $$
+  D_u D_v k^4 -(D_v f_u + g_v D_u)k^2 + \det J <0
+  $$
+
+- We need this condition to be true for *all* $k$. So we can study the worst case scenario. When is the left hand side the biggest? Let’s maximize it!
+
+- $\frac{d}{dk} \det H$ and then set this $=0$ gives us $k_*^2 = \frac{D_v f_u + D_u g_v}{2D_uD_v}$​. Plug this back into our condition and we get 
+  $$
+  -(D_v f_u + D_u g_v)^2 + 4D_u D_v \det J <0.
+  $$
+
+- And that’s it! That is some condition for diffusion-driven instability. In total, we found these three conditions, all evaluated at the steady state $u_0, v_0$ where $f(u_0,v_0)=0$ and $g(u_0,v_0)=0$. 
+
+  - $-(D_v f_u + D_u g_v)^2 + 4D_u D_v \det J <0.$
+  - $f_u + g_v <0$
+  - $f_ug_v-f_vg_u>0$ 
+
+- These are very hard to interpret!
+- If we take $f_u <0$ then this forces $g_v>0$ and $f_u+g_v <0$ means that it requires $D_v > D_u$. 
+- This gives us a physical interpretation: patterns form when $u$ is a “self activator” and $v$ is an inhibitor (of $u$). Importantly, $u$ must be “localized” (small diffusion coefficient) and $v$ must be long-range (large diffusion coefficient).
+- This would basically be impossible to guess without the math!
