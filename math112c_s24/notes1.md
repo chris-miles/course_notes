@@ -503,7 +503,7 @@ end
 
 - The PDE we will study next is
   $$
-  \partial_t u = \partial_xx u + u - u^2.
+  \partial_t u = \partial_{xx} u + u - u^2.
   $$
 
 - Where does this come from? Take the ODE for growth with carrying capacity, $u' = ru$ (unbounded growth), and then $u' =ru (1-u/K)$. So as $u\to K$. Always a stable equilibrium.
@@ -512,13 +512,15 @@ end
 
 - So how do we get Fisher-KPP? 
 
-- Take $\partial_t u = D\partial_{xx} u  + ru(1-u/k) = D\partial_{xx} + \alpha u - \beta u^2$. We could study this but it's messy. Call $v=(\alpha/\beta)u$ $\tau = \sqrt{\alpha} t$ and $y = \sqrt{\alpha/D} x$.
+- Take $\partial_t u = D\partial_{xx} u  + ru(1-u/k) = D\partial_{xx} + \alpha u - \beta u^2$. We could study this but it's messy. Call $v=(\beta/\alpha)u$ $\tau = \alpha t$ and $y = \sqrt{\alpha/D} x$.
 
 - You can check $\alpha$ must have units of time. So $y,\tau$ are unitless. This process is called "non-dimensionalization".
 
-- Mechanically, it's easy $\partial u \partial t = (\partial u /\partial\tau)(\partial \tau / \partial_t) =\alpha \partial_\tau u $​. 
+- Mechanically, it's easy $\partial u /\partial t = (\partial u /\partial\tau)(\partial \tau / \partial_t) =\alpha \partial_\tau u $​. 
 
-- And by this $\partial_{xx}u = (\alpha/D)\partial_{yy}u$. So plugging this all together, we get $(\alpha/\beta)\partial_\tau u $$= (\alpha/\beta)\partial_{yy}u +$$ (\alpha/\beta)u-(\alpha/\beta)^2u^2$ and of course this is just $\partial_\tau v = \partial_{yy}v + v - v^2$. But since we are lazy we will go back to writing $x,t, u$​.  
+- And by this $\partial_{xx}u = (\alpha/D)\partial_{yy}u$. 
+
+- So plugging this all together, we get $(\alpha/\beta)\partial_\tau u $$= (\alpha/\beta)\partial_{yy}u +$$ (\alpha/\beta)u-(\beta/\alpha)^2u^2$ and of course this is just $\partial_\tau v = \partial_{yy}v + v - v^2$. But since we are lazy we will go back to writing $x,t, u$​.  
 
 - Here is another derivation, from epidemiology. 
 
@@ -676,6 +678,36 @@ end
   - $f_ug_v-f_vg_u>0$ 
 
 - These are very hard to interpret!
+
 - If we take $f_u <0$ then this forces $g_v>0$ and $f_u+g_v <0$ means that it requires $D_v > D_u$. 
+
 - This gives us a physical interpretation: patterns form when $u$ is a “self activator” and $v$ is an inhibitor (of $u$). Importantly, $u$ must be “localized” (small diffusion coefficient) and $v$ must be long-range (large diffusion coefficient).
+
 - This would basically be impossible to guess without the math!
+
+- As a specific example, take the **Gray-Scott** model. There are three reactions: 
+
+  - A “feed” reaction where $V$  particles are added at a constant rate $a$ that “replenishes” when the concentration is low, so this term is $a(1-v)$. If $v$ gets close to $1$ , then we add nothing. As $v$ gets low, we add more. 
+  - A “death” reaction where $U \to^b \varnothing$ at a rate proportional to the concentration, so we remove $u$ at rate $-(b+a)u$, where $b$ is the “excess” kill rate beyond the rate $a$ that it is being removed at.  
+  - An “autocatalysis” reaction $V + 2U\to 3U$ (at rate 1), that means $U$ uses $V$ to make more of itself.
+
+- This gives us the system 
+  $$
+  \partial_t u &= D_u \partial_{xx}u + vu^2 - (b+a)u\\
+  \partial_t v &= D_v \partial_{xx}v - uv^2 + a(1-v).
+  $$
+  
+
+- https://visualpde.com/nonlinear-physics/gray-scott.html Play around with this! 
+
+- Now we can ask, does this satisfy the conditions of a Turing pattern?
+
+- It’s messy but straightforward. First we find the steady-states by setting
+  $$
+  0 = v_0 u_0^2 - (b+a)u_0 \\
+  0 = -u_0 v_0^2 + a(1-v_0)
+  $$
+
+- This has two equilibria. The first is $[u_0,v_0]=[0,1]$ and the other is $[u_0,v_0]=[(a+b)(2a+b)/a, a/(2a+b)]$.
+
+- 
