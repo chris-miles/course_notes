@@ -479,6 +479,8 @@ end
 
 ## Part 2, Reaction-diffusion equations (PDEs in biology)
 
+I am largely taking these ideas from *[Biology in Time and Space: A Partial Differential Equation Modeling Approach](https://www.ams.org/bookstore-getitem/item=amstext-50)*  James P. Keener.
+
 - Before we start: you should try to brainstorm. Are there any phenomena in biology that you think are appropriately modeled by PDEs? What features do they have?
 - Typically it is: things changing in *space* and *time*. Often this is physical space, but "space" could also be more abstract, like $x$ could represent a particular set of genes.
 - The equations we'll talk about for a week or two are **reaction-diffusion equations**. 
@@ -649,10 +651,10 @@ end
   $$
   \begin{bmatrix} \tilde{u}(x,t) \\ \tilde{v}(x,t) \end{bmatrix} = \begin{bmatrix}\alpha \\ \beta\end{bmatrix} e^{\lambda t} e^{ikx}
   $$
-  
+
 - Why this form? Remember this is like Homework 2 stability (of a numerical method). We know $e^{ikx}$ are basically sines/cosines that showed up everywhere in 112A/B. This tells us whether a particular sine/cosine will grow or shrink. 
 
--  Plugging this in, we get the equation
+- Plugging this in, we get the equation
   $$
   \partial_t \begin{bmatrix} \tilde{u}(x,t) \\ \tilde{v}(x,t) \end{bmatrix} =  \begin{bmatrix}f_u - k^2 D_u & f_v \\ g_u & g_v - k^2 D_v \end{bmatrix} \begin{bmatrix} \tilde{u}(x,t) \\ \tilde{v}(x,t) \end{bmatrix}
   $$
@@ -679,9 +681,9 @@ end
 
 - These are very hard to interpret!
 
-- If we take $f_u <0$ then this forces $g_v>0$ and $f_u+g_v <0$ means that it requires $D_v > D_u$. 
+- If we take $f_u <0$ then this forces $g_v>0$ and $f_u+g_v <0$ means that it requires $D_u > D_v$. 
 
-- This gives us a physical interpretation: patterns form when $u$ is a “self activator” and $v$ is an inhibitor (of $u$). Importantly, $u$ must be “localized” (small diffusion coefficient) and $v$ must be long-range (large diffusion coefficient).
+- Importantly, $v$ must be “localized” (small diffusion coefficient) and $u$ must be long-range (large diffusion coefficient). That is, without $v$, $f_u<0$ means that $u$ stabilizes itself, whereas the condition $g_v>0$ means that $v$ is unstable. So one could say $u$ is the stabilizer of $v$. So in this case $v$ is the “activator” and $u$ is the “inhibitor”. 
 
 - This would basically be impossible to guess without the math!
 
@@ -696,7 +698,6 @@ end
   \partial_t u &= D_u \partial_{xx}u + vu^2 - (b+a)u\\
   \partial_t v &= D_v \partial_{xx}v - uv^2 + a(1-v).
   $$
-  
 
 - https://visualpde.com/nonlinear-physics/gray-scott.html Play around with this! 
 
@@ -705,9 +706,25 @@ end
 - It’s messy but straightforward. First we find the steady-states by setting
   $$
   0 = v_0 u_0^2 - (b+a)u_0 \\
-  0 = -u_0 v_0^2 + a(1-v_0)
+  0 = -v_0 u_0^2 + a(1-v_0)
   $$
 
-- This has two equilibria. The first is $[u_0,v_0]=[0,1]$ and the other is $[u_0,v_0]=[(a+b)(2a+b)/a, a/(2a+b)]$.
+- This actually has three equilibria. The first is $[u_0,v_0]=[0,1]$ but that isn’t that interesting. The other two are more complicated but sometimes are not even valid solutions (try to plug in numbers and you’ll see you get complex values). For the sake of illustration, let’s just choose the simple steady state. See Keener book for further discussion on which is more appropriate to choose. 
+
+- Now we compute the derivatives $f_u, g_v$ etc and plug in these values and check the conditions.
+
+- The first condition $f_u+g_v<0$ is obvious since $a>0$ and $b>0$. The next condition, $-(D_v f_u + D_u g_v)^2 + 4D_u D_v \det J <0$ is definitely less obvious but it’s something we can evaluate and that is good enough for the homework. 
+
+  
+## Part 3: random walks, and probability-related PDEs
 
 - 
+- 
+
+
+
+## Part 4: Black-Scholes equation and financial PDEs
+
+- 
+- 
+
