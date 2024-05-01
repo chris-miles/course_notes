@@ -715,15 +715,90 @@ I am largely taking these ideas from *[Biology in Time and Space: A Partial Diff
 
 - The first condition $f_u+g_v<0$ is obvious since $a>0$ and $b>0$. The next condition, $-(D_v f_u + D_u g_v)^2 + 4D_u D_v \det J <0$ is definitely less obvious but it’s something we can evaluate and that is good enough for the homework. 
 
+
+### Outlook
+
+- Although we have shown the conditions for a “Turing instability” - we have said really nothing about the pattern itself. It’s possible to do this, but outside the scope of our class.
+- More broadly, we have looked at only a few examples of PDEs in biology but there are many more, ranging from molecular scale to ecological. 
+- Some people will do projects on these, so we’ll stop here and move on to another topic. 
+
+## Part 3: Random walks, probability-related PDEs
+
+- The next part of the class is about how PDEs show up in the study of other mathematical areas too. 
+- In this part, I’ll give an introduction to how PDEs arise from random walks, and more broadly, “stochastic differential equations.”
+- This is also a very deep subject so our coverage will be superficial, but I want to convey that the PDE formulations are actually useful for understanding these probabilistic objects.
+
+### Limit of a simple random walk
+
+- Imagine we are a “random walker” – a model for randomly moving objects. Again, this could be physical movement , or something more abstract like how evolution randomly wiggles around genotypes.
+
+- Take our values to be on a “lattice” or a grid, with spacing $h$. That is, our particle can be at $\ldots, -2h, h, 0, h, 2h,\ldots$ 
+
+- Every time $\tau$, we take a step (or not). There are a few possibilities for how we decide this (and might get different answers), but I think the easiest one we could do is something like:
+
+  - With probability $1/4$ we take a step to the left
+  - With probability $1/4$ we take a step to the right
+  - With probability $1/2$ we stay put.
+
+- This is a random “stochastic” process. Every time we do a simulation (generate a “path”), we get a different answer. 
+
+- How do we characterize the behavior of this process? We could do many simulations (this is the “pathwise” view), or try to characterize how likely it is that we see some particular outcome. 
+
+- Focusing on the latter for now: call $p(x,t)$ the probability our particle is at position $x$ at time $t$. Can we write down an equation for this? Yes, by simple bookkeeping. 
+  $$
+  p(x,t + \tau) = \frac{1}{2}p(x,t) + \frac{1}{4}p(x-h,t) + \frac{1}{4}p(x+h,t).
+  $$
+
+- Where did this come from? If our particle is at position $x$ at the next time, there are really only three ways it could have gotten there. We account for all of them.
+
+- You could try to solve this equation (a “difference equation”), but there is a special circumstance that relates to our PDE class. 
+
+- Imagine that we now move very often, so $\tau$ is small and $h$ is also very small, so the grid becomes very fine. We aren’t quite yet specifying how quickly each of these gets small, but we’ll do that later. 
+
+- For now, if I say something is small, you should think: Taylor series.
+
+- Taylor expanding everything,  we get a very familiar object:
+  $$
+  p(x,t+\tau) \approx p(x,t) + \tau \partial_t p + \mathcal{O}(\tau^2)\\
+  \frac{1}{2}p(x,t) + \frac{1}{4}p(x-h,t) + \frac{1}{4}p(x+h,t) \approx \frac{1}{2}p\\\ +\frac{1}{4}(p + h\partial_x p +  (h^2/2)\partial_{xx}p + \mathcal{O}(h^3)) \\
+  + \frac{1}{4}(p - h\partial_x p + (h^2/2)\partial_{xx}p-  \mathcal{O}(h^3))
+  $$
+
+- After some cancellation, what are we left with?
+  $$
+  \tau \partial_t p = \frac{h^2}{2}\partial_{xx} p + \mathcal{O}(\tau^2) + \mathcal{O}(h^4).
+  $$
+  And we rearrange to get
+  $$
+  \partial_t p = \frac{h^2}{2\tau}\partial_{xx} p + \mathcal{O}(\tau) + \mathcal{O}(h^4/\tau).
+  $$
+  And now we have a very familiar looking object. The diffusion equation!
+
+- In fact, this give us a “microscopic” interpretation of the diffusion coefficient $D=h^2/(2\tau)$​. 
+
+- Note the technical subtle point that if $h^2 \to 0$ much faster than $\tau$ then this goes to 0. That says: if we made the grid VERY fine and do not hop “fast enough” to compensate, it looks like we do not move at all. 
+
+- In summary: we have found that the simple random walk can be described by the familiar diffusion equation. What is the initial condition? $p(x,0) = \delta(x)$. That is, all of the probability is at $x=0$​ initially, and then spreads out.
+
+- The solution to this PDE is of course, from 112A/B: 
+  $$
+  p(x,t) = \frac{1}{\sqrt{4 \pi D t}}e^{-x^2/(4Dt)}.
+  $$
+  As in, a Gaussian distribution that spreads out over time. 
+
+- **In-class or homework exercise: **re-derive the equation but now take an *asymmetric* random walk, where the probability of going to the right is greater than the left. Pick any values you want for it. You could keep it general, $p_L, p_\mathrm{stay}, p_R$ so long as they sum to 1. 
+
+### Brownian motion, stochastic differential equations (very briefly)
+
+- This limit of infinitely fast moving but small movements to compensate you can think of as the model itself. 
+
+- That is, instead of discrete time hops, we now move continuously in time, but randomly. This new “random walk” model is famously called **Brownian motion**. 
+
   
-## Part 3: random walks, and probability-related PDEs
-
-- 
-- 
 
 
 
-## Part 4: Black-Scholes equation and financial PDEs
+## Part 4: Black-Scholes and financial PDEs
 
 - 
 - 
