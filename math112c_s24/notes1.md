@@ -892,7 +892,7 @@ I am largely taking these ideas from *[Biology in Time and Space: A Partial Diff
 
 - You can see how this roughly intuits to your PDE intuition: $\mu$ is like an “advection” term that moves particles at a veloicty and $D$ is a diffusion term.
 
-  #### Ornstein-Uhlenbeck Process
+### Ornstein-Uhlenbeck Process
 
 - As a concrete example, take $\mu(X_t,t) = -kX_t$ and $D(X_t,t)= D$, so we have 
   $$
@@ -911,9 +911,9 @@ I am largely taking these ideas from *[Biology in Time and Space: A Partial Diff
   $$
 
 - So does this differ from Brownian motion in the long term? It doesn’t continue to spread out. It concentrates around $x=0$. It is sometimes called a “restoring force”. 
-- What would ODE solutions do? $x’(t) = -kx$. They just decay to 0. These solutions wiggle around those solutions. 
 
-#### Beyond
+- What would ODE solutions do? $x’(t) = -kx$. They just decay to 0. These solutions wiggle around those solutions. 
+### Beyond
 
 - Since this is not a stochastics class I do not want to spend more time on this but I hope you are at least intrigued. 
 
@@ -941,7 +941,7 @@ I am largely taking these ideas from *[Biology in Time and Space: A Partial Diff
 
 - One area that SDEs saw heavy historical use was finance. I do not want to go much into this, but since a Nobel prize was won for a PDE, I figure it is worth covering in our class. 
 
-  #### Ito’s Lemma
+### Ito’s Lemma
 
   
 
@@ -958,6 +958,6 @@ I am largely taking these ideas from *[Biology in Time and Space: A Partial Diff
 
 - Don’t feel too stressed by this. We’ll just use it later so I wanted to state it now while the SDEs were recently introduced. Now, a little bit of finance.
 
-  #### Options pricing
+### Options pricing
 
   
