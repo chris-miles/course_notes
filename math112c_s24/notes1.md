@@ -786,20 +786,178 @@ I am largely taking these ideas from *[Biology in Time and Space: A Partial Diff
   $$
   As in, a Gaussian distribution that spreads out over time. 
 
-- **In-class or homework exercise: **re-derive the equation but now take an *asymmetric* random walk, where the probability of going to the right is greater than the left. Pick any values you want for it. You could keep it general, $p_L, p_\mathrm{stay}, p_R$ so long as they sum to 1. 
+- **Homework exercise: **re-derive the equation but now take an *asymmetric* random walk, where the probability of going to the right is greater than the left. Pick any values you want for it. You could keep it general, $p_L, p_\mathrm{stay}, p_R$​ so long as they sum to 1. 
 
-### Brownian motion, stochastic differential equations (very briefly)
+- Why is this a useful framework to think about things? 
 
-- This limit of infinitely fast moving but small movements to compensate you can think of as the model itself. 
+- We could write the random walk as $X(n) = \sum_{i=1}^{n}X_i$. Each $X_i =1$ with probability $1/2$ or $-1$ with probability $1/2$. These are “random variables”. Then $X(n)$ is also a random variable.
 
-- That is, instead of discrete time hops, we now move continuously in time, but randomly. This new “random walk” model is famously called **Brownian motion**. 
+- What if we wanted to know something like… How far have we moved, on average? $\langle X(n)\rangle$ the average, or you would have maybe written this as $E[X(n)]$ in your probability class. We need to know probability stuff to calculate this. (Actually not so bad for this example but imagine instead the hopping probabilities depended on $X$, then things would be messy!)
 
-  
+- Instead, we can study random processes in the “PDE” description and basically know no probability at all! (physicists do this a lot)
+
+- The average position at time $t$ is simply $\langle x(t) \rangle = \int_{-\infty}^{\infty} x p(x,t) \mathrm{d}x$.  That’s just the definition of average for a probability density $p(x,t)$. I will call this quantity $m(t)$ for the “mean”. 
+
+- Now if we go back to our PDE, multiply by $x$ and integrate:
+  $$
+  \int x \partial_t p , \mathrm{d} x = D \int x \partial_{xx}p \, \mathrm{d} x
+  $$
+
+- How do we handle the left term? Move the $\partial_t$ outside and get $\partial_t \int x p dx = \partial_t m(t)$. 
+
+- What about the right term? Integrate by parts!
+  $$
+  \int x\partial_{xx} p \mathrm{d}x = [x \partial_x p]_{-\infty}^{\infty} - \int\partial_{x}p \mathrm{d}x.
+  $$
+
+- The only way the first term is finite is if $\partial_x p \to 0$ as $x \to \pm \infty$, so let’s just decide that. The second term becomes $p(-\infty) -  p(\infty)$ but we also expect these to go to zero, so the whole thing goes to zero and we’re left with 
+  $$
+  \partial_t m = 0.
+  $$
+
+- This says $m(t) = C$ or $\langle x(t) \rangle = 0$ .The mean is constant! What constant in particular? If $p(x,0)=\delta(x)$ we can integrate this and get $m(0) = \int x \delta(x) \mathrm{d}x = 0$. This makes intuitive sense. Since we randomly move symmetrically, we do not go anywhere on average. We got all of this from the PDE (and didn’t even need to solve it!)
+
+- What about the spread about the mean? Note the “variance” is $\langle [x(t) - m(t) ]^2 \rangle = \langle x(t)^2 \rangle - m(t)^2 $$ = \langle x(t)^2 \rangle$​. 
+
+- We can compute this in the same way! Multiply both sides of our PDE by $x^2$ and integrate.
+  $$
+  \int  x^2 \partial_t p = D\int x^2 \partial_{xx}p \,  \mathrm{d}x
+  $$
+  and integrate by parts (twice, actually). 
+
+- If I call $v(t) =\langle x(t)^2\rangle$ , we eventually  get $\partial_t v(t) = 2D$ by using the fact that $\int p \mathrm{d}x = 1$​ .
+
+- This has solution, noting that $v(0)=0$ (check yourself!) 
+  $$
+  v(t) = \langle x^2(t) \rangle = 2Dt.
+  $$
+
+- This is a famous feature about random walks! The “mean squared displacement” grows *linearly* with time. 
+
+- This says, over longer timespans, things “spread out” more, in this very particular way. 
+
+- Random walks are a huge field and I have just presented a very simple example of one. Ultimately I just want you to take the point that: **random processes can be understood from the PDE perspective by thinking about how probability “moves” around**.
+
+### Brownian motion, stochastic differential equations, Fokker-Planck (very briefly)
+
+- In the previous section, we wrote down a “discrete time, discrete space” random walk, and then wrote down the “master equation” and took a limit as the steps and spacing became small in a particular way. 
+
+- Interpreting the PDE in this limit is easy (we got diffusion) but what if we wanted to go back to the random (pathwise) description. What is this object? We can’t really simulate it on a computer because we can’t set $\tau=0$ and $h=0$. 
+
+- The resulting object is a random process called **Brownian motion** to physicsts, **Wiener process** to mathematicians. Arguably the most fundamental process in stochastic processes. 
+
+- History: Lucretius (60 BC) remarked how dust moves randomly. Robert Brown in 1827 realized that lifeless pollen moved around in water because of bumping into water molecules. Einstein wrote down the math, derived the diffusion equation basically the same way we did. Norbert Wiener added a lot of rigor and precision to Einstein’s math. 
+
+- Brownian motion is a *continuous time, continuous position* process (although non-differentiable).
+
+- I’ll call it $B_t$ (because I was raised by wolves/physicists), but mathematicians will write $W_t$ . It is characterized by:
+
+  - $B_0= 0$ 
+  - $B_t$ has independent increments, and specifically they satisfy $B_t - B_s = \mathcal{N}(0,D(t-s))$​ 
+
+- Note that $\mathcal{N}$ is the “normal” distribution, the standard Gaussian bell curve. 
+
+- This makes sense! Independent increments says the past does not influence our next move. And then how should we move? Nowhere on average, but we move some little amount based on the normal distribution. 
+
+- Brownian motion is easy to simulate! Use Euler’s method. 
+
+- Take $t_0, t_1 = t_0 + \Delta t$, etc. Fixed time step. Then, the algorithm for simulating Brownian motion at these fixed times, $B_0, B_1, \ldots$  is as follows:
+  $$ { }
+  B_{n+1}= B_n + \sqrt{2D(\Delta t)} \cdot \texttt{randn}
+  $$
+
+- What does this say? It says to do an “increment”, randomly draw from a normal distribution (with the right variance) and add that as the step. 
+
+-  From these definitions, you can show properties like $\langle B(t) \rangle =0$ and $\langle B(t)^2\rangle = 2Dt$ or you can write down the diffusion PDE and show it from there.
+
+- One of Einstein’s contributions was to identify what $D$ is, from a physical perspective. He found that $D = k_B T/\zeta$, where $\zeta$ is the “viscosity” or how crowded the liquid is (think honey vs. water), $k_B$ is “Boltzmann’s constant”, a famous physics constant, and $T$​ is temperature.
+
+- Brownian motion is incredibly rich on its own. You should talk more about it in Math 140C? 
+
+- But I want to point out that Brownian motion is one example of a random motion, and more generally we can add “drift” or make the noise more general.
+
+- If $X_t$ is a generic stochastic process, we can call Brownian motion a special case where $$ d X_t = \sqrt{2D} B_t$$
+
+- Much more generally, a stochastic differential equation can take the form 
+  $$
+  dX_t = \mu(X_t, t) \,dt + \sqrt{2D(X_t,t)} \,dB_t
+  $$
+
+- So Brownian motion is the case where $\sigma$ does not depend on $X_t$ or $t$ and $\mu=0$. What is $\mu$? Well if $D =0 $ then  we have $d X_t = \mu(X_t, t) dt$. This is just an ODE! This part is called the “drift” and is a “non-random” part. 
+
+- Why do I mention all of this? The analog of the diffusion equation for this process is called **The Fokker-Planck equation** 
+  $$
+  \frac{\partial}{\partial t} p(x, t) = -\frac{\partial}{\partial x}\left[\mu(x, t) p(x, t)\right] + \frac{\partial^2}{\partial x^2}\left[D(x, t) p(x, t)\right]
+  $$
+
+- You can see how this roughly intuits to your PDE intuition: $\mu$ is like an “advection” term that moves particles at a veloicty and $D$ is a diffusion term.
+
+  #### Ornstein-Uhlenbeck Process
+
+- As a concrete example, take $\mu(X_t,t) = -kX_t$ and $D(X_t,t)= D$, so we have 
+  $$
+  d X_t = -kX_t + \sqrt{2D} dB_t,
+  $$
+  or in Fokker-Planck form, equivalently,
+  $$
+  \partial_tp = -\partial_x\{(-kx)p\}+D\partial_{xx}p.
+  $$
+
+- This is not so scary of a PDE!
+
+- In fact, if we look at steady state $\partial_t =0$, we find the solution is 
+  $$
+  p_{ss}(x) = \sqrt{k/(2\pi D)} e^{-2kx^2/D}.
+  $$
+
+- So does this differ from Brownian motion in the long term? It doesn’t continue to spread out. It concentrates around $x=0$. It is sometimes called a “restoring force”. 
+- What would ODE solutions do? $x’(t) = -kx$. They just decay to 0. These solutions wiggle around those solutions. 
+
+#### Beyond
+
+- Since this is not a stochastics class I do not want to spend more time on this but I hope you are at least intrigued. 
+
+- The punchline is: **there are really interesting “stochastic” differential equations with very rich behavior, and the connection to our class is: we can understand them by writing down a Fokker-Planck equation (which is the generalization of the diffusion equation)**
+
+- As a final note, you can get really interesting behavior from these systems.
+
+- Take for instance, $x’(t) = V’(x)$ where $V(x) = \frac{1}{4}x^4 -x^2$.  This can be thought of as a ball rolling around in a potential energy landscape with $V(x)$​. You’ll note there are two stable equilibria! An ODE solution would just get stuck in one. 
+
+  <img src="potentialwell_1.jpg" style="width:80%;" />
+
+- Instead, when we add noise, so 
+
+  $$ dX_t = V’(x)dt + \sigma d B_t$$
+
+  we see that the system randomly switches between the two stable equilibria! 
+
+  <img src="potentialwell_2.jpg" style="width:50%;" />
 
 
+
+- This is called  “bistable” switch, and is a fundamental phenomena for physics, biology. We could calculate stuff like: what average is the time to switch? What fraction of time does it spend in one state or another? All from the PDE! PDEs are very useful in studying random behavior!
 
 ## Part 4: Black-Scholes and financial PDEs
 
-- 
-- 
+- One area that SDEs saw heavy historical use was finance. I do not want to go much into this, but since a Nobel prize was won for a PDE, I figure it is worth covering in our class. 
 
+  #### Ito’s Lemma
+
+  
+
+- There is a key technical hang up that I want to address now and use with later. 
+
+- When you have a non-random process, you have the chain rule from calculus. It might look something like, for $f(x,t)$:  $$df (x,t) = (\partial_t f) dt + (\partial_x f) d x$$​. 
+
+- Unfortunately for stochastic processes, the traditional chain rule fails. The “stochastic chain rule” is instead “Ito’s Lemma”. It is pretty technical and I don’t want to get into the “why” but you have enough background now to at least understand the statement.
+
+- **Ito’s Lemma**: Suppose $X_t$ satisfies the SDE $dX_t = \mu(X_t,t) dt + \sigma(X_t,t) d B_t$. Then, the transformed process $Y_t = f(X_t,t)$ (so imagine something like, $Y_t = \log X_t -t$) satisfies the SDE:
+  $$
+  d Y_t = \left( \partial_t f + \mu \partial_x f + \frac{\sigma^2}{2} \partial_{xx}f  \right)dt + \sigma (\partial_x f) d B_t.
+  $$
+
+- Don’t feel too stressed by this. We’ll just use it later so I wanted to state it now while the SDEs were recently introduced. Now, a little bit of finance.
+
+  #### Options pricing
+
+  
