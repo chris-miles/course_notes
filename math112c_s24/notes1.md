@@ -1021,7 +1021,7 @@ I am largely taking these ideas from *[Biology in Time and Space: A Partial Diff
 
 - $V(0,t) =0$ since if $s=0$ then $V=0$
 
-- Also $V(s,t) \to s$ as $s\to \infty$ because this must serve as an “upper bound” for the value.
+- Also $V(s,t) \to s-k$ as $s\to \infty$ because this must serve as an “upper bound” for the value.
 
 - Lastly, we have $V(s,T) = \max\{s-k,0\}$ where $k$ is the strike price. This is a “terminal” condition, which is a bit different than most “initial” conditions we see. 
 
