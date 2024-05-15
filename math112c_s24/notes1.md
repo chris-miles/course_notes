@@ -978,29 +978,41 @@ I am largely taking these ideas from *[Biology in Time and Space: A Partial Diff
 
   $$d S_t =  \mu S_t dt + S_t\sigma d B_t$$. 
 
-- We see $\mu$ has the same interpretation but now there is noise called “volatility.” Intuitively, if $S_t$ is larger, the amount of volatility should go up too, so the overall noise scales $\propto \sigma S_t$​. 
+- We see $\mu$ has the same interpretation but now there is noise called “volatility.” Intuitively, if $S_t$ is larger, the amount of volatility should go up too, so the overall noise scales $\propto \sigma S_t$​​. 
 
-- We know the Fokker-Planck PDE for this price would be $\partial_t p (s,t) = -\partial_s \{ (\mu s )p\} + \frac{(\sigma s)^2}{2} \partial_{ss}p$.  Ugly, but we could solve it using finite differences. 
+- We know the Fokker-Planck PDE for this price would be $\partial_t p (s,t) = -\partial_s \{ (\mu s )p\} + \frac{(\sigma s)^2}{2} \partial_{ss}p$​.  Ugly, but we could solve it using finite differences. 
 
-- However, we aren’t interested in the asset itself, but the option! 
+- We also assume there is an “interest rate” $r$ such that if we invested 1 dollar at time 0, then it would be worth $R_t = e^{rt}$ at time $t$. 
 
-- Call $V(S,t)$ the *value* of the option. A “portfolio” is a strategy of buying and selling $A$ units of $S_t$. We don’t know the value $V$ yet but suppose we had 1 of these options.
+- However, we aren’t interested in the asset itself, but the option!
 
-- In the case we have 1 option, our total portfolio value is $\Pi(t) = V(S,t) - A S(t)$, so the change is $d \Pi = d V -A dS$​. 
+- Call $V(S,t)$ the *value* of the option. We don’t know this yet, but it’s the ultimate goal of what we want to compute. 
 
-- Here is where we use Ito’s lemma! We want to write down $d V$, which is $$(\mu \partial_s V + \partial_t V + \sigma^2/2 \partial_{ss}V) dt + \sigma \partial_s V d B_t$$. 
-
-- And this makes $d \Pi = dV - A dS$ , a bit ugly, but we can calculate $$d \Pi =  dt (\mu S(\partial_V - A) + \partial_t V +\cdots) + \sigma S(\partial_s V - A) dB_t$$​.  
-
-- I wrote the $\cdots$ because the drift term we do not care about. We care about the second term. When $A = \partial_s V$ there is no randomness at all! 
-
-- This is the “no arbitrage” rule in finance - if we invest correctly in this asset, it should not gain us more than the risk-free version. 
-
-- So the risk free statement says that $0= r \Pi dt - d \Pi$ and we just computed $d\Pi$,  so we have $$r \Pi dt = (\partial_t V + \sigma^2/2 + s^2 \partial_{ss}V) dt.$$ 
-
-- Using the definition of $\Pi = V - S \partial_s V$ we finally arrive at the **Black-Scholes PDE**
+- To make progress, we now use Ito’s lemma!  
   $$
-  r V = \partial_t V + \frac{\sigma^2}{2} s^2 \partial_{ss}V + rs \partial_s V.
+  dV = [\mu S (\partial_s V) + \partial_t V +  \frac{(\sigma S)^2}{2} \partial_{ss}V] dt + \sigma S (\partial_s V) d B_t$
+  $$
+
+- Now we need to introduce some finance jargon. We want a “self-financing” portfolio. This is a “trading strategy”, where we hold $x_t$ units of cash and $y_t$ units of the stock, so the total value is 
+
+  $$P_t = x_t R_t + y_t S_t.$$
+
+- Of course we can take some derivatives of this and get $d P_t = x_t dR_t + y_t dS_t$ and we know everything here, finding 
+  $$
+  dP_t = (rx_t R_t + y_t \mu  S_t)dt + y_t \sigma S_t d B_t.
+  $$
+
+- Now we want to enforce that our portfolio is “self financing. Squint at the two numbered equations. From this, we find 
+  $$
+  y_t = \partial_s V, \qquad r x_t R_t = \partial_t V + \frac{(\sigma S)^2}{2} \partial_{ss} V
+  $$
+
+- Elaborating a bit: we want the strategy to replicate the value of the option. Any gains or losses on the portfolio are entirely due to gains or losses in the underlying assets, not due to changes in $x_t$ or $y_t$. 
+
+- With these choices, if $V_0=P_0$ then $V_t=P_t$ for all times. So if we substitute everything back into the $P_t$​ equation, we finally get the **Black-Scholes PDE**
+
+  $$
+  0 = \partial_t V + \frac{\sigma^2}{2} s^2 \partial_{ss}V + rs \partial_s V - rV.
   $$
 
 - As a reminder, $r$ is the risk-free interest rate, $\sigma$ is the volatility of the asset, $V$ is the value of the derivative and $s$ is the value of the underlying asset. 
