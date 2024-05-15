@@ -956,8 +956,87 @@ I am largely taking these ideas from *[Biology in Time and Space: A Partial Diff
   d Y_t = \left( \partial_t f + \mu \partial_x f + \frac{\sigma^2}{2} \partial_{xx}f  \right)dt + \sigma (\partial_x f) d B_t.
   $$
 
+- For example, take $Y_t = e^{X_t}$ then we have $\partial_t f =0$, $\partial_x f = e^{X_t}  = Y_t$ and $\partial_{xx} f= e^{X_t}=Y_t$. So plugging this in gives us $dY_t = (\mu Y_t + (\sigma^2/2)Y_t)dt + \sigma Y_t dB_t$. This means the corresponding Fokker-Planck equation for $p(y,t)$ is $\partial_t p = -\partial_y \{(\mu y + y\sigma^2/2)p\} + (\sigma^2 y^2)/2 \partial_{yy}p$.   
+
 - Don’t feel too stressed by this. We’ll just use it later so I wanted to state it now while the SDEs were recently introduced. Now, a little bit of finance.
 
 ### Options pricing
 
-  
+- “Derivatives” are effectively betting on another asset. e.g., I want to bet on the price of milk in X months
+
+- “Options” are the **right** to buy (“strike”) at time $T$ at price $k$ and sell it right away for a profit. 
+
+- An “American option” is one where you can buy at any time $t \leq T$. 
+
+- Payoff = $S_T-k$ if $S_T>k$ or $0$ otherwise, which we can write $\max\{S_T-k,0\}$​. 
+
+- How much is this contract “worth”? This is of course tied to what we believe the asset price $S_T$ will be. This has uncertainty so we want to model it in a way that reflects that.
+
+- A “risk free” asset would satisfy $ds = \mu S \, dt$ or $s(t) = s(0)e^{\mu t}$ . This is risk free because we can predict the price exactly and it goes up or down depending on $\mu$. 
+
+- There is uncertainty… So we should use an SDE instead. Let’s take:
+
+  $$d S_t =  \mu S_t dt + S_t\sigma d B_t$$. 
+
+- We see $\mu$ has the same interpretation but now there is noise called “volatility.” Intuitively, if $S_t$ is larger, the amount of volatility should go up too, so the overall noise scales $\propto \sigma S_t$​. 
+
+- We know the Fokker-Planck PDE for this price would be $\partial_t p (s,t) = -\partial_s \{ (\mu s )p\} + \frac{(\sigma s)^2}{2} \partial_{ss}p$.  Ugly, but we could solve it using finite differences. 
+
+- However, we aren’t interested in the asset itself, but the option! 
+
+- Call $V(S,t)$ the *value* of the option. A “portfolio” is a strategy of buying and selling $A$ units of $S_t$. We don’t know the value $V$ yet but suppose we had 1 of these options.
+
+- In the case we have 1 option, our total portfolio value is $\Pi(t) = V(S,t) - A S(t)$, so the change is $d \Pi = d V -A dS$​. 
+
+- Here is where we use Ito’s lemma! We want to write down $d V$, which is $$(\mu \partial_s V + \partial_t V + \sigma^2/2 \partial_{ss}V) dt + \sigma \partial_s V d B_t$$. 
+
+- And this makes $d \Pi = dV - A dS$ , a bit ugly, but we can calculate $$d \Pi =  dt (\mu S(\partial_V - A) + \partial_t V +\cdots) + \sigma S(\partial_s V - A) dB_t$$​.  
+
+- I wrote the $\cdots$ because the drift term we do not care about. We care about the second term. When $A = \partial_s V$ there is no randomness at all! 
+
+- This is the “no arbitrage” rule in finance - if we invest correctly in this asset, it should not gain us more than the risk-free version. 
+
+- So the risk free statement says that $0= r \Pi dt - d \Pi$ and we just computed $d\Pi$,  so we have $$r \Pi dt = (\partial_t V + \sigma^2/2 + s^2 \partial_{ss}V) dt.$$ 
+
+- Using the definition of $\Pi = V - S \partial_s V$ we finally arrive at the **Black-Scholes PDE**
+  $$
+  r V = \partial_t V + \frac{\sigma^2}{2} s^2 \partial_{ss}V + rs \partial_s V.
+  $$
+
+- As a reminder, $r$ is the risk-free interest rate, $\sigma$ is the volatility of the asset, $V$ is the value of the derivative and $s$ is the value of the underlying asset. 
+
+- We need boundary conditions!
+
+- $V(0,t) =0$ since if $s=0$ then $V=0$
+
+- Also $V(s,t) \to s$ as $s\to \infty$ because this must serve as an “upper bound” for the value.
+
+- Lastly, we have $V(s,T) = \max\{s-k,0\}$ where $k$ is the strike price. This is a “terminal” condition, which is a bit different than most “initial” conditions we see. 
+
+- Amazingly enough, this PDE can actually be solved analytically using a cute change of variables:
+  $$
+  \tau = (\sigma^2/2)(T-t), \quad x = \ln(s/k), \quad V = ku(x,\tau), \quad k=(2r)/\sigma^2.
+  $$
+  and then the PDE becomes 
+  $$
+  u_\tau = u_{xx} + (k-1)u_x - ku
+  $$
+  This is almost a PDE we can solve… 
+
+- Another change of variables! Take $w(x,\tau) = e^{ax+b\tau}u(x,\tau)$ where $a = 1-k/2$ and $b= -(k+1)^2/4$ and finally we get the $w_\tau = w_{xx}$ on the interval $\tau \in [0, T\sigma^2/2]$. A diffusion equation! We know how to solve this.
+
+- After the dust settles, the boundary conditions end up being $w(x,0) = \max\{e^{(k+1)x/2} - e^{(k-1)x/2},0\}$, and $w(x,\tau) \to 0 $ as $x\to \pm \infty$​. Solved with the Fourier transform. 
+
+- And finally, we get the **Black-Scholes formula**:
+  $$
+  V(s,t) = s N(d_1 )- ke^{-rT}N(d_2)
+  $$
+  where 
+  $$
+  d_1  =\frac{1}{\sigma \sqrt{T-t}}\left[\ln \left(\frac{s}{K}\right)+\left(r+\frac{\sigma^2}{2}\right)(T-t)\right] \\ d_{2} =d_{1}-\sigma \sqrt{T-t}
+  $$
+  and $N(x) = \frac{1}{2\pi}\int_{-\infty}^x e^{-z^2/2} dz$. 
+
+- Of course this is a horrible mess but imagine you were a finance person. You could make a spreadsheet formula that now just calculates the value of these options given some input parameters. This is why this won a Nobel prize!
+
+- For our class, I really just wanted you to be a aware this PDE exists. The derivation I presented is admittedly sketchy. If you want more details, take the math finance classes!
