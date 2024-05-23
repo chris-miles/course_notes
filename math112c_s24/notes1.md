@@ -1112,7 +1112,7 @@ I am largely taking these ideas from *[Biology in Time and Space: A Partial Diff
 
 - The only interesting bit is $\mathcal{F}^{-1}[\hat{g}]$ which we have to do a bit of work to compute 
   $$
-  \mathcal{F}^{-1}[\hat{g}]= \frac{1}{2\pi}\int_{-\infty}^{\infty} e^{-k^2t} e^{ikx}dk =  \frac{1}{2\pi}\int_{-\infty}^{\infty} e^{-k^2t + ikx} dk = \frac{1}{\sqrt{4\pi t}}e^{-x^2/(4t)}. 
+  \mathcal{F}^{-1}[\hat{g}]= \frac{1}{2\pi}\int_{-\infty}^{\infty} e^{-k^2t} e^{ikx}dk =  \frac{1}{2\pi}\int_{-\infty}^{\infty} e^{-k^2t + ikx} dk = \frac{1}{\sqrt{4\pi t}}e^{-x^2/(4t)}.
   $$
   This is an ugly calculation but do-able in a few ways. One is completing the square in the exponent.
 
@@ -1121,7 +1121,32 @@ I am largely taking these ideas from *[Biology in Time and Space: A Partial Diff
   u(x,t) = f(x) \star g(x) = \int_{–\infty}^{\infty} f(x-y) g(y) dy = \frac{1}{\sqrt{4\pi t}}\int^{\infty}_\infty e^{-(x-y)^2/(4t)}f(y) dy.
   $$
 
-- One way to interpret this is $f(x)=\delta(x)$ then $u(x,t) = g(x)$. This says that you can think of the integral as “smearing out” the influence of $f(y)$ to point $x$​ at each time. 
+- One way to interpret this is $f(x)=\delta(x)$ then $u(x,t) = g(x)$. This says that you can think of the integral as “smearing out” the influence of $f(y)$ to point $x$​​ at each time. 
+
+#### Wave equation with Fourier Transforms
+
+- As another example of using Fourier transforms to solve (linear) PDEs on an infinite domain, consider the familiar 
+  $$
+  \partial_{tt} u = c^2 \partial_{xx}u, \qquad u(x,0)=f(x), \quad \partial_t u(x,0)=0.
+  $$
+
+- After Fourier transforming, we get $\partial_{tt} \hat{u} = - c^2 k^2 \hat{u}$. 
+
+- This is a little tougher of an ODE to solve: $U'' + (ck)^2 U = 0$. It has two roots, complex roots so solutions take the form
+  $$
+  \hat{u}(k,t) = \hat{A}(k)e^{-ickt} + \hat{B}(k)e^{ickt}
+  $$
+
+- Now we need to invert. I will simply do the first term and the second follows by just flipping a sign. 
+  $$
+  \mathcal{F}^{-1}[\hat{A}(k)e^{-ickt}] = (2\pi)^{-1}\int_{-\infty}^{\infty}\hat{A}(k)e^{-ickt} e^{ikx} dk\\
+  = (2\pi)^{-1}\int_{-\infty}^{\infty}\hat{A}(k) ^{ik(x-ct)} dk\\
+  = A(x-ct)
+  $$
+
+  where $A = \mathcal{F}^{-1}[\hat{A}]$. 
+
+- And this means our total solution takes the form $$u(x,t) = A(x-ct) + B(x+ct)$$ which is exactly the form of D’Alembert’s solution you derived in 112A or 112B. 
 
 #### Outlook
 
@@ -1146,3 +1171,4 @@ $$
 $$
 
 - Roughly these correspond to mass being transported with some velocity, that may or may not depend on the density $u$ itself. 
+- **We ran out of time! If a PDE for your project looks like this, come talk to Chris.** 
